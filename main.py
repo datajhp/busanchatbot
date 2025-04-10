@@ -1,10 +1,10 @@
 import streamlit as st
 import os
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 from langchain.schema import Document, ChatResult
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.schema.messages import BaseMessage, HumanMessage, AIMessage
 from langchain.chat_models.base import BaseChatModel
 from groq import Groq
@@ -49,7 +49,7 @@ class GroqLlamaChat(BaseChatModel):
 # ✅ 벡터스토어 불러오기
 @st.cache_resource
 def load_vectorstore():
-    embedding_model = HuggingFaceEmbeddings(model_name='BAAI/bge-m3')
+    embedding_model = HuggingFaceEmbeddings(model_name="intfloat/e5-small-v2")
     return FAISS.load_local("busan_db", embedding_model, allow_dangerous_deserialization=True)
 
 # ✅ API 키 불러오기
@@ -73,7 +73,7 @@ if st.button("💬 질문 실행") and query:
         api_key = load_api_key()
         template = load_template()
         vectorstore = load_vectorstore()
-        retriever = vectorstore.as_retriever(search_kwargs={"k": 10})
+        retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
         llm = GroqLlamaChat(groq_api_key=api_key)
 
         prompt = PromptTemplate.from_template(template)
