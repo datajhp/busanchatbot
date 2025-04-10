@@ -1,10 +1,7 @@
+streamlit
 langchain==0.1.13
-langchain-community
-pydantic==1.10.13
 faiss-cpu
 sentence-transformers
 transformers
-torch
-streamlit
 groq
-
+torch
