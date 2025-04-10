@@ -8,6 +8,9 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.schema.messages import BaseMessage, HumanMessage, AIMessage
 from langchain.chat_models.base import BaseChatModel
 from groq import Groq
+import pandas as pd
+from geopy.geocoders import Nominatim
+import folium
 
 # ✅ 커스텀 ChatModel 클래스
 class GroqLlamaChat(BaseChatModel):
@@ -93,3 +96,40 @@ if st.button("💬 질문 실행") and query:
         for i, doc in enumerate(result["source_documents"]):
             with st.expander(f"문서 {i+1}"):
                 st.write(doc.page_content)
+
+
+
+
+
+# CSV 파일 읽기
+df = pd.read_csv("company_addresses.csv")  # CSV 파일 경로로 수정
+
+# Geocoding을 통해 주소를 위도, 경도로 변환
+geolocator = Nominatim(user_agent="geoapiExercises")
+
+# 스트림릿 애플리케이션 제목
+st.title("회사 위치 지도")
+
+# 지도 생성
+map = folium.Map(location=[35.1796, 129.0756], zoom_start=12)  # 부산의 기본 좌표로 설정
+
+# 각 회사에 대해 주소를 위도와 경도로 변환하고 마커 추가
+for index, row in df.iterrows():
+    address = row['공장대표주소(지번)']
+    company_name = row['회사명']
+    
+    # 주소를 위도, 경도로 변환
+    location = geolocator.geocode(address)
+    
+    if location:
+        latitude = location.latitude
+        longitude = location.longitude
+        # 지도에 마커 추가
+        folium.Marker([latitude, longitude], popup=f"{company_name}\n{address}").add_to(map)
+    else:
+        st.warning(f"주소를 찾을 수 없습니다: {address}")
+
+# 스트림릿에서 지도를 표시
+map_html = 'map.html'
+map.save(map_html)
+st.components.v1.html(open(map_html, 'r').read(), height=500)
