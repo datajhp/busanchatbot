@@ -106,7 +106,7 @@ df = pd.read_csv("부산광역시_제조업 공장등록 현황_241231 (1).csv",
   # CSV 파일 경로로 수정
 
 # Geocoding을 통해 주소를 위도, 경도로 변환
-geolocator = Nominatim(user_agent="geoapiExercises")
+geolocator = Nominatim(user_agent="your_app_name_here")
 
 # 스트림릿 애플리케이션 제목
 st.title("회사 위치 지도")
