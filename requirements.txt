@@ -1,7 +1,6 @@
 streamlit
-langchain==0.1.13
-faiss-cpu
-sentence-transformers
-transformers
+langchain
+langchain-community
 groq
-torch
+sentence-transformers
+faiss-cpu
