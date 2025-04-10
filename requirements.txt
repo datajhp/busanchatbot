@@ -4,3 +4,6 @@ langchain-community
 groq
 sentence-transformers
 faiss-cpu
+geopy 
+pandas 
+folium
