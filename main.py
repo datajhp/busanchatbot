@@ -108,47 +108,38 @@ if st.button("💬 질문 실행") and query:
 
 import pandas as pd
 import streamlit as st
-from geopy.geocoders import GoogleV3
+from geopy.geocoders import Nominatim
 import folium
 
-# Google API 키 입력 (발급받은 API 키로 교체)
-google_api_key = "YOUR_GOOGLE_API_KEY"  # Google API 키 입력
+# CSV 파일 읽기
+df = pd.read_csv("company_addresses.csv")  # CSV 파일 경로로 수정
 
-# GoogleV3 Geocoder 설정
-geolocator = GoogleV3(api_key=google_api_key)
-
-# CSV 파일 경로에 맞게 수정
-df = pd.read_csv("부산광역시_제조업 공장등록 현황_241231 (1).csv", encoding='cp949')  # 또는 'euc-kr'
+# Geocoding을 통해 주소를 위도, 경도로 변환
+geolocator = Nominatim(user_agent="geoapiExercises")
 
 # 스트림릿 애플리케이션 제목
 st.title("회사 위치 지도")
 
-# 지도 생성: 부산의 기본 좌표로 설정
-map = folium.Map(location=[35.1796, 129.0756], zoom_start=12)
+# 지도 생성
+map = folium.Map(location=[35.1796, 129.0756], zoom_start=12)  # 부산의 기본 좌표로 설정
 
 # 각 회사에 대해 주소를 위도와 경도로 변환하고 마커 추가
 for index, row in df.iterrows():
     address = row['공장대표주소(지번)']
     company_name = row['회사명']
     
-    try:
-        # 주소를 위도, 경도로 변환
-        location = geolocator.geocode(address)
-        
-        if location:
-            latitude = location.latitude
-            longitude = location.longitude
-            # 지도에 마커 추가
-            folium.Marker([latitude, longitude], popup=f"{company_name}\n{address}").add_to(map)
-        else:
-            st.warning(f"주소를 찾을 수 없습니다: {address}")
+    # 주소를 위도, 경도로 변환
+    location = geolocator.geocode(address)
     
-    except Exception as e:
-        st.error(f"주소 변환 중 오류 발생: {address} - {str(e)}")
+    if location:
+        latitude = location.latitude
+        longitude = location.longitude
+        # 지도에 마커 추가
+        folium.Marker([latitude, longitude], popup=f"{company_name}\n{address}").add_to(map)
+    else:
+        st.warning(f"주소를 찾을 수 없습니다: {address}")
 
 # 스트림릿에서 지도를 표시
 map_html = 'map.html'
 map.save(map_html)
-
-# 지도 HTML을 스트림릿에서 표시
 st.components.v1.html(open(map_html, 'r').read(), height=500)
